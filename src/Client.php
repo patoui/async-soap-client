@@ -33,6 +33,7 @@ class Client extends SoapClient
 
     /** @var int|bool */
     private $oneWay;
+
     /** @var \GuzzleHttp\Client */
     private $client;
 
@@ -116,18 +117,18 @@ class Client extends SoapClient
         };
 
         $responses = [];
-        $errors    = [];
 
         (new Pool($this->client, $requests($this->requests), [
             'concurrency' => 50,
-            'fulfilled'   => static function (ResponseInterface $r) use (&$responses) {
-                $responses[] = (string) $r->getBody();
+            'fulfilled'   => static function (ResponseInterface $response) use (&$responses) {
+                $responses[] = $response->getBody()->getContents();
             },
-            'rejected'    => static function (RequestException $reason, $index) use (&$errors) {
-                $errors[] = $reason;
+            'rejected'    => static function (RequestException $reason, $index) use (&$responses) {
+                $response = $reason->getResponse();
+                $responses[] = $response ? $response->getBody()->getContents() : $reason->getMessage();
             },
         ]))->promise()->wait(false);
 
-        return [$responses, $errors];
+        return $responses;
     }
 }

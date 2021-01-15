@@ -129,7 +129,6 @@ class CurlClient extends SoapClient
     public function process(): array
     {
         $responses = [];
-        $errors    = [];
 
         do {
             $res = curl_multi_exec($this->multi_handler, $running);
@@ -165,6 +164,6 @@ class CurlClient extends SoapClient
 
         curl_multi_close($this->multi_handler);
 
-        return [$responses, $errors];
+        return $responses;
     }
 }
