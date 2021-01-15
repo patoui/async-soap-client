@@ -1,0 +1,25 @@
+{
+  "name": "patoui/async-soap-client",
+  "description": "Async Soap Client",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Patrique Ouimet",
+      "email": "patrique.ouimet@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "^7.3",
+    "ext-curl": "*",
+    "ext-soap": "*",
+    "ext-json": "*",
+    "ext-simplexml": "*",
+    "guzzlehttp/guzzle": "^7.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "AsyncSoap\\": "src"
+    }
+  }
+}
