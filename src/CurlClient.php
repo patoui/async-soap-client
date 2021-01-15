@@ -6,7 +6,12 @@ namespace AsyncSoap;
 
 use RuntimeException;
 use SoapClient;
+use SoapFault;
 
+/**
+ * Class CurlClient
+ * @package AsyncSoap
+ */
 class CurlClient extends SoapClient
 {
     /** @var false|resource */
@@ -14,9 +19,6 @@ class CurlClient extends SoapClient
 
     /** @var array */
     private $handlers;
-
-    /** @var array */
-    private $requests = [];
 
     /** @var string */
     private $request;
@@ -33,6 +35,12 @@ class CurlClient extends SoapClient
     /** @var int|bool */
     private $oneWay;
 
+    /**
+     * CurlClient constructor.
+     * @param       $wsdl
+     * @param array $options
+     * @throws SoapFault
+     */
     public function __construct($wsdl, array $options = [])
     {
         parent::__construct($wsdl, $options);
@@ -41,6 +49,14 @@ class CurlClient extends SoapClient
         }
     }
 
+    /**
+     * Add request to process asynchronously
+     * @param string     $name Soap action or function name (i.e. AddInteger)
+     * @param array      $arguments Arguments for function call (i.e. [['Arg1' => 1, 'Arg2' => 2]])
+     * @param array|null $options
+     * @param array|null $inputHeaders
+     * @return $this
+     */
     public function addRequest(
         string $name,
         array $arguments,
@@ -86,6 +102,16 @@ class CurlClient extends SoapClient
         return $this;
     }
 
+    /**
+     * Override parent method and set value to class properties to be
+     * used for setting up async requests
+     * @param string $request
+     * @param string $location
+     * @param string $action
+     * @param int    $version
+     * @param int    $oneWay
+     * @return string
+     */
     public function __doRequest($request, $location, $action, $version, $oneWay = 0): string
     {
         $this->request  = $request;
@@ -96,6 +122,10 @@ class CurlClient extends SoapClient
         return '';
     }
 
+    /**
+     * Process curl handlers (requests) with curl_multi_* functions
+     * @return array[]
+     */
     public function process(): array
     {
         $responses = [];

@@ -10,6 +10,10 @@ use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\ResponseInterface;
 use SoapClient;
 
+/**
+ * Class Client
+ * @package AsyncSoap
+ */
 class Client extends SoapClient
 {
     /** @var array */
@@ -32,12 +36,26 @@ class Client extends SoapClient
     /** @var \GuzzleHttp\Client */
     private $client;
 
+    /**
+     * Client constructor.
+     * @param       $wsdl
+     * @param array $options
+     * @throws \SoapFault
+     */
     public function __construct($wsdl, array $options = [])
     {
         parent::__construct($wsdl, $options);
         $this->client = new \GuzzleHttp\Client();
     }
 
+    /**
+     * Add request to process asynchronously
+     * @param string     $name Soap action or function name (i.e. AddInteger)
+     * @param array      $arguments Arguments for function call (i.e. [['Arg1' => 1, 'Arg2' => 2]])
+     * @param array|null $options
+     * @param array|null $inputHeaders
+     * @return $this
+     */
     public function addRequest(
         string $name,
         array $arguments,
@@ -65,6 +83,16 @@ class Client extends SoapClient
         return $this;
     }
 
+    /**
+     * Override parent method and set value to class properties to be
+     * used for setting up async requests
+     * @param string $request
+     * @param string $location
+     * @param string $action
+     * @param int    $version
+     * @param int    $oneWay
+     * @return string
+     */
     public function __doRequest($request, $location, $action, $version, $oneWay = 0): string
     {
         $this->request  = $request;
@@ -75,6 +103,10 @@ class Client extends SoapClient
         return '';
     }
 
+    /**
+     * Process guzzle requests
+     * @return array[]
+     */
     public function process(): array
     {
         $requests = static function (array $requests) {
