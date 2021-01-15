@@ -140,7 +140,7 @@ class CurlClient extends SoapClient
                 curl_close($handler);
             }
             curl_multi_close($this->multi_handler);
-            return [[], []];
+            return [];
         }
 
         while ($details = curl_multi_info_read($this->multi_handler)) {
